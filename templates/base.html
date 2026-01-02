@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Our Adventures{% endblock %}</title>
+    <!-- CSS Original -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <!-- CSS Responsivo (NUEVO) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='responsive-mobile.css') }}">
+
     <meta name="color-scheme" content="light dark">
 </head>
 <body class="book-theme">

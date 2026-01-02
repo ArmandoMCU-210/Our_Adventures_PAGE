@@ -1864,9 +1864,7 @@ textarea:focus {
         font-size: var(--font-size-2xl);
     }
     
-    .cover-navigation {
-        flex-direction: column;
-    }
+
     
     .floating-action {
         bottom: var(--space-20);
@@ -1910,7 +1908,7 @@ textarea:focus {
     }
     
     .cover-image-placeholder {
-        width: 150px;
+        width:260px;
         height: 225px;
         margin-bottom: var(--space-24);
     }

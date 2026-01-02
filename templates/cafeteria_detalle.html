@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}{{ cafeteria.nombre }} - Our Adventures{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+    <a href="{{ url_for('cafeterias') }}" class="back-button">← Volver a Cafeterías</a>
+    
+    <div class="page-header">
+        <h1>☕ {{ cafeteria.nombre }}</h1>
+    </div>
+
+    <!-- BOTONES MODIFICAR -->
+    <div style="display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap;">
+        <a href="{{ url_for('edit_cafeteria', id=cafeteria.id) }}" class="btn-secondary" style="text-decoration: none;">
+            ✏️ Modificar
+        </a>
+    </div>
+    
+    <div class="detail-header">
+        <!-- PORTADA PERSONALIZADA O PLACEHOLDER -->
+        {% if cafeteria.imagen and cafeteria.imagen != 'default.jpg' %}
+            <div class="detail-image-container">
+                <img 
+                    src="{{ url_for('static', filename='uploads/cafeterias/' + cafeteria.imagen) }}" 
+                    alt="{{ cafeteria.nombre }}"
+                    class="detail-image"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        {% else %}
+            <div class="detail-image-container" style="background: linear-gradient(135deg, #f0ebe5 0%, #d4c4b0 100%); display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center;">
+                    <div style="font-size: 3em; margin-bottom: 12px;">☕</div>
+                    <small style="color: #626c7c;">Sin portada</small>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="detail-info">
+            <h1>{{ cafeteria.nombre }}</h1>
+            
+            <div class="location-detail">
+                📍 <strong>Ubicación:</strong><br>
+                {{ cafeteria.ubicacion }}
+            </div>
+            
+            {% if cafeteria.google_maps_url %}
+                <a href="{{ cafeteria.google_maps_url }}" target="_blank" class="maps-link">
+                    🗺️ Abrir en Google Maps
+                </a>
+            {% endif %}
+            
+            <div class="status-indicator {% if cafeteria.visitada == 'True' or cafeteria.visitada == 'true' %}visited{% else %}not-visited{% endif %}">
+                {% if cafeteria.visitada == 'True' or cafeteria.visitada == 'true' %}
+                    ✓ Visitada
+                {% else %}
+                    ○ No visitada
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- EVALUACIONES LIKERT CON ALMACENAMIENTO -->
+    <div class="section">
+        <h2>⭐ Evaluación de la Cafetería</h2>
+        <p style="color: var(--color-text-secondary); margin-bottom: 20px;">
+            Califica tu experiencia en esta cafetería
+        </p>
+
+        <form id="evaluationForm" method="POST" action="{{ url_for('save_cafeteria_evaluation', id=cafeteria.id) }}">
+            <!-- Calidad de la Comida -->
+            <div class="likert-item" style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--color-text);">
+                    1. Calidad de la Comida
+                </label>
+                <div class="likert-scale" style="display: flex; gap: 8px; justify-content: space-between;">
+                    {% for i in range(1, 6) %}
+                    <label style="display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.3s ease;" 
+                           class="likert-option" data-value="{{ i }}" data-field="food_quality">
+                        <input type="radio" name="food_quality" value="{{ i }}" 
+                            {% if cafeteria.food_quality and cafeteria.food_quality|int == i %}checked{% endif %}
+                            style="margin-bottom: 8px; cursor: pointer;">
+                        <span class="likert-number" style="font-weight: 600; font-size: 1.1em; color: var(--color-primary);">{{ i }}</span>
+                        <small style="color: var(--color-text-secondary); font-size: 0.85em; text-align: center;">
+                            {% if i == 1 %}Malo{% elif i == 2 %}Pobre{% elif i == 3 %}Bueno{% elif i == 4 %}Muy Bueno{% else %}Excelente{% endif %}
+                        </small>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% if cafeteria.food_quality %}
+                <div style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, rgba(33, 128, 141, 0.1) 0%, rgba(50, 184, 198, 0.1) 100%); border-radius: 8px; border-left: 4px solid var(--color-primary);">
+                    <strong style="color: var(--color-primary);">✓ Seleccionaste: {{ cafeteria.food_quality }} / 5</strong>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Ambiente del Lugar -->
+            <div class="likert-item" style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--color-text);">
+                    2. Ambiente del Lugar
+                </label>
+                <div class="likert-scale" style="display: flex; gap: 8px; justify-content: space-between;">
+                    {% for i in range(1, 6) %}
+                    <label style="display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.3s ease;" 
+                           class="likert-option" data-value="{{ i }}" data-field="ambiance">
+                        <input type="radio" name="ambiance" value="{{ i }}"
+                            {% if cafeteria.ambiance and cafeteria.ambiance|int == i %}checked{% endif %}
+                            style="margin-bottom: 8px; cursor: pointer;">
+                        <span class="likert-number" style="font-weight: 600; font-size: 1.1em; color: var(--color-primary);">{{ i }}</span>
+                        <small style="color: var(--color-text-secondary); font-size: 0.85em; text-align: center;">
+                            {% if i == 1 %}Malo{% elif i == 2 %}Pobre{% elif i == 3 %}Bueno{% elif i == 4 %}Muy Bueno{% else %}Excelente{% endif %}
+                        </small>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% if cafeteria.ambiance %}
+                <div style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, rgba(33, 128, 141, 0.1) 0%, rgba(50, 184, 198, 0.1) 100%); border-radius: 8px; border-left: 4px solid var(--color-primary);">
+                    <strong style="color: var(--color-primary);">✓ Seleccionaste: {{ cafeteria.ambiance }} / 5</strong>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Ganas de Volver -->
+            <div class="likert-item" style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--color-text);">
+                    3. Ganas de Volver a Ir
+                </label>
+                <div class="likert-scale" style="display: flex; gap: 8px; justify-content: space-between;">
+                    {% for i in range(1, 6) %}
+                    <label style="display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.3s ease;" 
+                           class="likert-option" data-value="{{ i }}" data-field="want_return">
+                        <input type="radio" name="want_return" value="{{ i }}"
+                            {% if cafeteria.want_return and cafeteria.want_return|int == i %}checked{% endif %}
+                            style="margin-bottom: 8px; cursor: pointer;">
+                        <span class="likert-number" style="font-weight: 600; font-size: 1.1em; color: var(--color-primary);">{{ i }}</span>
+                        <small style="color: var(--color-text-secondary); font-size: 0.85em; text-align: center;">
+                            {% if i == 1 %}Malo{% elif i == 2 %}Pobre{% elif i == 3 %}Bueno{% elif i == 4 %}Muy Bueno{% else %}Excelente{% endif %}
+                        </small>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% if cafeteria.want_return %}
+                <div style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, rgba(33, 128, 141, 0.1) 0%, rgba(50, 184, 198, 0.1) 100%); border-radius: 8px; border-left: 4px solid var(--color-primary);">
+                    <strong style="color: var(--color-primary);">✓ Seleccionaste: {{ cafeteria.want_return }} / 5</strong>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Botón Guardar Evaluación -->
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 20px;">
+                💾 Guardar Evaluación
+            </button>
+        </form>
+
+        <!-- Mostrar Calificación Promedio -->
+        {% if cafeteria.food_quality or cafeteria.ambiance or cafeteria.want_return %}
+        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%); padding: 16px; border-radius: 12px; border-left: 4px solid var(--color-warning);">
+            <h3 style="margin: 0 0 12px 0; color: var(--color-text);">📊 Tu Calificación General</h3>
+            {% set avg = ((cafeteria.food_quality|int(0) + cafeteria.ambiance|int(0) + cafeteria.want_return|int(0)) / 3) if (cafeteria.food_quality or cafeteria.ambiance or cafeteria.want_return) else 0 %}
+            <div style="font-size: 2em; font-weight: 700; color: var(--color-primary);">
+                {{ "%.1f"|format(avg) }} / 5.0 ⭐
+            </div>
+            <small style="color: var(--color-text-secondary);">
+                {% if avg >= 4.5 %}🔥 ¡Excelente!{% elif avg >= 3.5 %}😊 Muy Bueno{% elif avg >= 2.5 %}👍 Bueno{% elif avg >= 1.5 %}😐 Pobre{% else %}😞 Malo{% endif %}
+            </small>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- GALERÍA GOOGLE FOTOS - SOLO LINK -->
+    <div class="section">
+        <h2>📸 Galería de Fotos</h2>
+        <p style="color: var(--color-text-secondary); margin-bottom: 20px;">
+            Comparte un álbum de Google Fotos para ver tus fotos
+        </p>
+
+        <!-- Formulario para guardar enlace -->
+        <div style="padding: 20px; background: var(--color-secondary); border-radius: 12px; margin-bottom: 24px;">
+            <h3 style="color: var(--color-text); margin-bottom: 12px;">🌐 Tu Álbum de Google Fotos</h3>
+            
+            <form method="POST" action="{{ url_for('save_cafeteria_google_photos', id=cafeteria.id) }}">
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                    <input type="text" name="google_photos_link" placeholder="https://photos.google.com/share/..."
+                        value="{{ cafeteria.google_photos_link or '' }}"
+                        style="flex: 1; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.95em;">
+                    <button type="submit" class="btn-primary" style="padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap;">
+                        💾 Guardar
+                    </button>
+                </div>
+                <small style="color: var(--color-text-secondary); font-size: 0.85em; display: block;">
+                    💡 Google Fotos → Álbum → Compartir → Crear enlace → Copia y pega aquí
+                </small>
+            </form>
+        </div>
+
+        <!-- Mostrar enlace guardado y botón -->
+        {% if cafeteria.google_photos_link %}
+            <div style="padding: 20px; background: var(--color-surface); border-radius: 12px; border: 1px solid var(--color-border); text-align: center;">
+                <p style="color: var(--color-text); margin: 0 0 16px 0; font-weight: 600;">✓ Álbum conectado</p>
+                
+                <a href="{{ cafeteria.google_photos_link }}" target="_blank" 
+                   style="display: inline-block; padding: 14px 32px; background: var(--color-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.3s ease; margin-bottom: 16px;"
+                   onmouseover="this.style.opacity='0.9'; this.style.transform='scale(1.05)'"
+                   onmouseout="this.style.opacity='1'; this.style.transform='scale(1)'">
+                    📸 Ver Álbum Completo
+                </a>
+
+                <div style="margin-top: 16px; padding: 12px; background: var(--color-secondary); border-radius: 8px; border-left: 3px solid var(--color-primary);">
+                    <p style="color: var(--color-text-secondary); margin: 0; font-size: 0.85em; word-break: break-all;">
+                        {{ cafeteria.google_photos_link }}
+                    </p>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 40px 20px; background: var(--color-surface); border-radius: 12px; border: 2px dashed var(--color-border);">
+                <p style="font-size: 2em; margin-bottom: 12px;">📸</p>
+                <p style="color: var(--color-text-secondary); margin: 0;">
+                    Sin galería conectada aún.<br>
+                    <strong style="color: var(--color-text);">Pega el enlace de tu álbum arriba</strong>
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    // Mostrar números seleccionados con color
+    document.querySelectorAll('.likert-option input[type="radio"]').forEach(input => {
+        input.addEventListener('change', function() {
+            const field = this.getAttribute('name');
+            const option = this.closest('.likert-option');
+            
+            document.querySelectorAll(`input[name="${field}"]`).forEach(radio => {
+                radio.closest('.likert-option').style.opacity = '0.5';
+                radio.closest('.likert-option').style.transform = 'scale(0.9)';
+            });
+            
+            option.style.opacity = '1';
+            option.style.transform = 'scale(1.1)';
+            option.querySelector('.likert-number').style.fontSize = '1.5em';
+            option.querySelector('.likert-number').style.color = 'var(--color-primary)';
+        });
+    });
+
+    document.querySelectorAll('.likert-option input[type="radio"]:checked').forEach(input => {
+        const option = input.closest('.likert-option');
+        option.style.opacity = '1';
+        option.style.transform = 'scale(1.1)';
+        option.querySelector('.likert-number').style.fontSize = '1.5em';
+        option.querySelector('.likert-number').style.color = 'var(--color-primary)';
+        
+        const field = input.getAttribute('name');
+        document.querySelectorAll(`input[name="${field}"]`).forEach(radio => {
+            if (radio !== input) {
+                radio.closest('.likert-option').style.opacity = '0.5';
+                radio.closest('.likert-option').style.transform = 'scale(0.9)';
+            }
+        });
+    });
+</script>
+
+{% endblock %}

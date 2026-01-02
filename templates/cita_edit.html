@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Modificar Cita - Our Adventures{% endblock %}
+
+{% block content %}
+
+<div class="detail-page">
+    <a href="{{ url_for('citas') }}" class="back-button">← Volver a Citas</a>
+    
+    <div class="page-header">
+        <h1>✏️ Modificar Cita</h1>
+    </div>
+
+    <!-- SECCIÓN INFORMACIÓN BÁSICA -->
+    <div class="section">
+        <h2>📝 Información Básica</h2>
+        
+        <form method="POST" style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+                <label for="nombre" style="display: block; margin-bottom: 8px; font-weight: 600;">Nombre</label>
+                <input type="text" id="nombre" name="nombre" value="{{ cita.nombre }}" 
+                    style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1em;">
+            </div>
+
+            <div>
+                <label for="ubicacion" style="display: block; margin-bottom: 8px; font-weight: 600;">Ubicación</label>
+                <input type="text" id="ubicacion" name="ubicacion" value="{{ cita.ubicacion }}" 
+                    style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1em;">
+            </div>
+
+            <div>
+                <label for="fecha" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha</label>
+                <input type="date" id="fecha" name="fecha" value="{{ cita.fecha or '' }}" 
+                    style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1em;">
+            </div>
+
+            <!-- CHECKBOX "REALIZADA" CON FECHA -->
+            <div>
+                <label style="display: flex; align-items: center; gap: 12px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
+                    <input type="checkbox" id="realizada-check" name="realizada" value="True" 
+                        {% if cita.realizada == 'True' or cita.realizada == 'true' %}checked{% endif %}
+                        style="width: 20px; height: 20px; cursor: pointer;">
+                    ✓ Cita realizada
+                </label>
+
+                <!-- Campo fecha de realización (aparece solo si está marcado) -->
+                <div id="fecha-realizada-container" style="display: {% if cita.realizada == 'True' or cita.realizada == 'true' %}block{% else %}none{% endif %}; margin-left: 32px;">
+                    <label for="fecha_realizada" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text);">Fecha en que se realizó</label>
+                    <input type="date" id="fecha_realizada" name="fecha_realizada" value="{{ cita.fecha_realizada or '' }}" 
+                        style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1em;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                💾 Guardar Cambios
+            </button>
+        </form>
+    </div>
+
+    <!-- SECCIÓN PORTADA -->
+    <div class="section">
+        <h2>🖼️ Portada de la Cita</h2>
+        <p style="color: var(--color-text-secondary); margin-bottom: 20px;">
+            Sube una foto bonita para que sea la portada de esta cita
+        </p>
+
+        <div style="padding: 20px; background: var(--color-secondary); border-radius: 12px; margin-bottom: 24px;">
+            <form method="POST" action="{{ url_for('upload_cita_image', id=cita.id) }}" enctype="multipart/form-data">
+                <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <input type="file" name="imagen" accept="image/*"
+                        style="flex: 1; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.95em; min-width: 200px;">
+                    <button type="submit" class="btn-primary" style="padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap;">
+                        📤 Subir Foto
+                    </button>
+                </div>
+                <small style="color: var(--color-text-secondary); font-size: 0.85em; display: block;">
+                    💡 Sube una imagen JPG, PNG o WebP. Será redimensionada automáticamente a 800x800px.
+                </small>
+            </form>
+
+            {% if cita.imagen and cita.imagen != 'default.jpg' %}
+                <div style="margin-top: 16px; padding: 12px; background: var(--color-surface); border-radius: 8px; border-left: 3px solid var(--color-primary);">
+                    <p style="color: var(--color-text-secondary); margin: 0; font-size: 0.9em;">
+                        <strong style="color: var(--color-text);">✓ Portada actual:</strong><br>
+                        {{ cita.imagen }}
+                    </p>
+                </div>
+            {% else %}
+                <div style="margin-top: 16px; padding: 12px; background: var(--color-surface); border-radius: 8px; border-left: 3px solid var(--color-warning);">
+                    <p style="color: var(--color-text-secondary); margin: 0; font-size: 0.9em;">
+                        <strong style="color: var(--color-text);">📸 Sin portada aún.</strong> Sube una foto para que sea visible en la página de detalle.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- PREVIEW DE LA PORTADA ACTUAL -->
+        {% if cita.imagen and cita.imagen != 'default.jpg' %}
+            <div style="margin-top: 20px;">
+                <p style="font-weight: 600; color: var(--color-text); margin-bottom: 12px;">📸 Vista previa actual:</p>
+                <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--color-border); max-width: 400px;">
+                    <img 
+                        src="{{ url_for('static', filename='uploads/citas/' + cita.imagen) }}" 
+                        alt="{{ cita.nombre }}"
+                        style="width: 100%; height: auto; display: block;">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- SECCIÓN PELIGRO - ELIMINAR -->
+    <div class="section" style="background: linear-gradient(135deg, rgba(255, 84, 89, 0.05) 0%, rgba(192, 21, 47, 0.05) 100%); border-left: 4px solid var(--color-error); border-radius: 12px;">
+        <h2 style="color: var(--color-error);">⚠️ Zona de Peligro</h2>
+        <p style="color: var(--color-text-secondary); margin-bottom: 20px;">
+            Esta acción no se puede deshacer. Elimina esta cita permanentemente.
+        </p>
+
+        <form method="POST" action="{{ url_for('delete_cita', id=cita.id) }}" 
+              onsubmit="return confirm('⚠️ ¿Estás seguro de que quieres eliminar esta cita? No se puede deshacer.');"
+              style="display: inline-block;">
+            <button type="submit" class="btn-danger" style="padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; background-color: var(--color-error); color: white; transition: all 0.3s ease;"
+                    onmouseover="this.style.opacity='0.9'; this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.opacity='1'; this.style.transform='scale(1)'">
+                🗑️ Eliminar Cita
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // Mostrar/ocultar campo de fecha al marcar "Realizada"
+    document.getElementById('realizada-check').addEventListener('change', function() {
+        const fechaContainer = document.getElementById('fecha-realizada-container');
+        if (this.checked) {
+            fechaContainer.style.display = 'block';
+        } else {
+            fechaContainer.style.display = 'none';
+        }
+    });
+</script>
+
+{% endblock %}

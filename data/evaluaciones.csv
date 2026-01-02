@@ -1,0 +1,10 @@
+id,tipo,item_id,categoria,calificacion
+4,cafeteria,2,comida,4
+5,cafeteria,2,ambiente,5
+6,cafeteria,2,volver,4
+7,cafeteria,3,comida,5
+8,cafeteria,3,ambiente,4
+9,cafeteria,3,volver,5
+9,cafeteria,1,comida,4
+9,cafeteria,1,ambiente,2
+9,cafeteria,1,volver,4

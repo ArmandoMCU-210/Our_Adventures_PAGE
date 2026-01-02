@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Our Adventures - Inicio{% endblock %}
+
+{% block content %}
+<div class="page-cover">
+    <div class="cover-content">
+    <div class="cover-image-placeholder">
+                <img src="{{ url_for('static', filename='img/our_adv.svg') }}" 
+                    class="cover-illustration" 
+                    alt="Ilustración principal">
+            </div>
+        
+
+        <p class="cover-subtitle">Un álbum como recuerdo de nosotros juntos 🤍</p>
+        
+        <div class="cover-navigation">
+            <a href="{{ url_for('cafeterias') }}" class="nav-button nav-cafeterias">
+                <span class="icon">☕</span>
+                <span>Ver Cafeterías</span>
+            </a>
+            <a href="{{ url_for('citas') }}" class="nav-button nav-citas">
+                <span class="icon">💕</span>
+                <span>Ver Citas</span>
+            </a>
+        </div>
+        
+        <p class="cover-footer">Haz clic para abrir el álbum</p>
+    </div>
+</div>
+{% endblock %}

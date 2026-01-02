@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Our Adventures{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta name="color-scheme" content="light dark">
+</head>
+<body class="book-theme">
+    <!-- Botón Toggle de Tema -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+        <span id="themeIcon">🌙</span>
+    </button>
+    
+    <div class="book-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // ===== Theme Toggle Script Actualizado =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const htmlElement = document.documentElement;
+
+        // Detectar preferencia del usuario o del sistema
+        const getPreferredTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) return savedTheme;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        // Aplicar tema
+        function applyTheme(theme) {
+            // Usamos 'data-color-scheme' para que coincida con tu CSS
+            htmlElement.setAttribute('data-color-scheme', theme);
+            // También mantenemos 'data-theme' por si acaso lo usas en otros selectores
+            htmlElement.setAttribute('data-theme', theme);
+            
+            localStorage.setItem('theme', theme);
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Inicializar
+        applyTheme(getPreferredTheme());
+
+        // Event listener del botón
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-color-scheme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+
+        // Escuchar cambios del sistema (opcional, solo si el usuario no ha elegido manualmente)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
+</body>
+</html>

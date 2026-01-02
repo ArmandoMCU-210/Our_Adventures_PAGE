@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Citas - Our Adventures{% endblock %}
+
+{% block content %}
+<div class="gallery-container">
+    <div class="page-header">
+        <h1>📅 Nuestras Citas</h1>
+        <a href="{{ url_for('index') }}" class="back-button" style="margin-top: 12px;">
+            🏠 Ir al Inicio
+        </a>
+    </div>
+
+    <div class="floating-action">
+    <form action="{{ url_for('add_cita') }}" method="POST">
+        <button type="submit" class="fab" style="background-color: var(--color-red-400);" title="Planear Cita">
+            +
+        </button>
+    </form>
+</div>
+
+    {% if citas %}
+    <div class="stamp-gallery">
+        {% for cita in citas %}
+        <div class="stamp-card {% if cita.realizada == 'True' or cita.realizada == 'true' %}visited{% endif %}">
+            <a href="{{ url_for('cita_detail', id=cita.id) }}" class="stamp-link">
+                
+                <div class="stamp-image-container">
+                    {% if cita.imagen and cita.imagen != 'default.jpg' %}
+                        <img src="{{ url_for('static', filename='uploads/citas/' + cita.imagen) }}" 
+                             alt="{{ cita.nombre }}" 
+                             style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    {% else %}
+                        <div style="background: linear-gradient(135deg, #f0ebe5 0%, #d4c4b0 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 3em; opacity: 0.6;">☕</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="stamp-content">
+                    <h3>{{ cita.nombre }}</h3>
+                    <div class="location">📍 {{ cita.ubicacion }}</div>
+                    
+                    {% if cita.fecha %}
+                        <div style="margin-top: 8px;">
+                            <span style="font-size: 0.8em; color: var(--color-text-secondary);">
+                                📅 {{ cita.fecha }}
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <div style="margin-top: 12px;">
+                        {% if cita.realizada == 'True' or cita.realizada == 'true' %}
+                            <span class="visited-badge">✓ Realizada</span>
+                        {% else %}
+                            <span class="not-visited-badge">○ Pendiente</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No hay citas aún. ¡Planea la primera! 📅</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

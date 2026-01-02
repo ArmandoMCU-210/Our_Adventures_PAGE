@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Cafeterías - Our Adventures{% endblock %}
+
+{% block content %}
+<div class="gallery-container">
+    <div class="page-header">
+    <h1>☕ Cafeterías</h1>
+    
+    <div style="margin: 20px 0; max-width: 300px;">
+        <form method="GET" action="{{ url_for('cafeterias') }}" id="sortForm">
+            <label for="sort" class="form-label">Ordenar por:</label>
+            <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                <option value="default" {% if current_sort == 'default' %}selected{% endif %}>Recientes (Por defecto)</option>
+                <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>⭐ Mejor valoradas</option>
+            </select>
+        </form>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-button">
+        🏠 Ir al Inicio
+    </a>
+</div>
+
+<div class="floating-action">
+    <form action="{{ url_for('add_cafeteria') }}" method="POST">
+        <button type="submit" class="fab" title="Añadir Cafetería">
+            +
+        </button>
+    </form>
+</div>
+
+<style>
+    .floating-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #28a745; /* Verde para cafeterías */
+        color: white;
+        border-radius: 50%;
+        border: none;
+        font-size: 30px;
+        cursor: pointer;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s, background-color 0.2s;
+        z-index: 1000;
+    }
+    .floating-btn:hover {
+        transform: scale(1.1);
+        background-color: #218838;
+    }
+    .floating-btn span {
+        margin-bottom: 4px; /* Ajuste óptico del símbolo + */
+    }
+</style>
+
+    {% if cafeterias %}
+    <div class="stamp-gallery">
+        {% for cafeteria in cafeterias %}
+        <div class="stamp-card {% if cafeteria.visitada == 'True' or cafeteria.visitada == 'true' %}visited{% endif %}">
+            <a href="{{ url_for('cafeteria_detail', id=cafeteria.id) }}" class="stamp-link">
+                
+                <div class="stamp-image-container">
+                    {% if cafeteria.imagen %}
+                        <img src="{{ url_for('static', filename='uploads/cafeterias/' + cafeteria.imagen) }}" 
+                             alt="{{ cafeteria.nombre }}" 
+                             style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    {% else %}
+                        <div style="background: linear-gradient(135deg, #f0ebe5 0%, #d4c4b0 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 3em; opacity: 0.6;">☕</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="stamp-content">
+                    <h3>{{ cafeteria.nombre }}</h3>
+                    <div class="location">📍 {{ cafeteria.ubicacion }}</div>
+                    
+                    {# Sección de calificación (opcional, mantenida de tu código original) #}
+                    {% if cafeteria.food_quality or cafeteria.ambiance or cafeteria.want_return %}
+                        {% set avg = ((cafeteria.food_quality|int(0) + cafeteria.ambiance|int(0) + cafeteria.want_return|int(0)) / 3) %}
+                        <div style="margin-top: 8px; font-size: 0.9em;">
+                            <span style="color: var(--color-warning); font-weight: bold;">⭐ {{ "%.1f"|format(avg) }}</span>
+                        </div>
+                    {% endif %}
+
+                    {# La fecha solo sale si ya ha sido visitada #}
+                    {% if (cafeteria.visitada == 'True' or cafeteria.visitada == 'true') and cafeteria.fecha_visita %}
+                        <div style="margin-top: 8px;">
+                            <span style="font-size: 0.8em; color: var(--color-text-secondary);">
+                                📅 {{ cafeteria.fecha_visita }}
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <div style="margin-top: 12px;">
+                        {% if cafeteria.visitada == 'True' or cafeteria.visitada == 'true' %}
+                            <span class="visited-badge">✓ Visitada</span>
+                        {% else %}
+                            <span class="not-visited-badge">○ Pendiente</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No hay cafeterías aún. ¡Agrega la primera! ☕</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
